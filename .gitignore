@@ -24,6 +24,9 @@ ENV/
 # Datos crudos (pesados, no se versionan)
 data/raw/
 
+# Datos procesados (regenerables desde 01_preprocesamiento.ipynb; train_processed.csv pesa ~240MB, supera el límite de GitHub)
+data/processed/*.csv
+
 # Modelos entrenados (pesados, no se versionan)
 models/*.model
 models/*.bin
