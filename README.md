@@ -57,6 +57,22 @@ Como ningún modelo entrenado sobre el archivo grande puede predecir "neutral", 
 
 ---
 
+## Datos versionados en el repositorio
+
+`data/raw/` y `data/processed/*.csv` están en `.gitignore` — se regeneran corriendo `00_lectura_y_discovery.ipynb` y `01_preprocesamiento.ipynb` respectivamente. El principal motivo es `train_processed.csv` (~230MB), que supera cómodamente el límite práctico de GitHub.
+
+**Nota pendiente (no decidida todavía):** se evaluó comprimir `train_processed.csv` para poder versionarlo. Mediciones sobre el archivo real:
+
+| Método | Tamaño resultante | Tiempo |
+|---|---|---|
+| gzip -9 | 78,3 MB | rápido |
+| xz -6 | 61,5 MB | ~2 min |
+| zstd -19 | 59,8 MB | ~1,3 min |
+
+Los tres entran bajo el límite duro de 100MB de GitHub, pero rondan la zona donde el clone del repo empieza a pesar (~60-80MB) y GitHub ya avisa de "archivo grande". Alternativa a considerar más adelante si se quiere que el repo sea autocontenido sin correr el pipeline: **Git LFS** en vez de comprimir a mano. Por ahora se mantiene sin publicar y se regenera localmente.
+
+---
+
 ## Pipeline detallado
 
 ### 1. Preprocesamiento específico para tweets
