@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Datos crudos (pesados, no se versionan)
+data/raw/
+
+# Modelos entrenados (pesados, no se versionan)
+models/*.model
+models/*.bin
+models/*.p
+models/*.pkl
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs y temporales
+*.log
+tmp/
