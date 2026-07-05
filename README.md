@@ -122,7 +122,9 @@ Más allá de lo pedido, se suma un análisis exploratorio pensado como diferenc
 - Cruzar el pico temático con la polaridad promedio de sentimiento de esos tweets, conectando este análisis con el resto del TP en lugar de dejarlo aislado.
 - BERTopic usa cosine similarity internamente (c-TF-IDF y UMAP), por lo que también aporta a la métrica obligatoria.
 
-**Resultado:** se confirmó un pico real y verificable — el tópico de la elección/protestas en Irán es prácticamente inexistente antes del 12/6/2009 (fecha de la elección) y explota el 15/6, con ~86% de tweets negativos (vs. ~50% esperado por el balance del dataset). La hipótesis inicial sobre la muerte de Michael Jackson (25/6/2009, límite superior del dataset) **no se confirmó**: la recolección del dataset corta a las 10:28 (PDT) de ese día, ~4 horas antes de que se anunciara su muerte (~14:26 PDT) — se documenta como hallazgo honesto en vez de forzar una conclusión que los datos no respaldan.
+**Aclaración importante:** los tópicos dominantes por volumen del corpus **no son políticos** — son charla cotidiana de Twitter (sueño/cama, agradecimientos, mascotas, clima, cumpleaños, el propio Twitter). Irán no es "el tópico principal" del dataset; es el caso de éxito elegido entre los eventos candidatos para poner a prueba la metodología de detección de eventos por picos de volumen.
+
+**Resultado:** de los dos eventos puntuales buscados específicamente por caer dentro del rango de fechas del dataset, solo uno dejó una huella detectable como tópico propio. El tópico de la elección/protestas en Irán es prácticamente inexistente antes del 12/6/2009 (fecha de la elección) y explota el 15/6, con ~86% de tweets negativos (vs. ~50% esperado por el balance del dataset) — un pico real y verificable. La hipótesis inicial sobre la muerte de Michael Jackson (25/6/2009, límite superior del dataset) **no se confirmó**: no llegó a formar un tópico propio (solo menciones sueltas y anteriores al hecho) porque la recolección del dataset corta a las 10:28 (PDT) de ese día, ~4 horas antes de que se anunciara su muerte (~14:26 PDT) — se documenta como hallazgo honesto en vez de forzar una conclusión que los datos no respaldan.
 
 ---
 
@@ -191,8 +193,9 @@ Desarrollo completo en `notebooks/06_conclusiones.ipynb`. Resumen:
 
 ### Sobre los tópicos (diferenciador)
 
-- **Confirmado**: el tópico de la elección/protestas en Irán es prácticamente inexistente antes del 12/6/2009 y explota el 15/6, con ~86% de sentimiento negativo (vs. ~50% esperado) — validación externa de que BERTopic detecta eventos reales, no ruido.
-- **Corregido, no forzado**: la hipótesis sobre Michael Jackson no se sostuvo (la recolección del dataset corta ~4hs antes del anuncio de su muerte) — se documentó como hallazgo honesto en vez de sostener una conclusión no respaldada por los datos.
+- **Los tópicos dominantes por volumen son charla cotidiana**, no política: sueño/cama, agradecimientos, mascotas, clima, cumpleaños, el propio Twitter. Irán **no es "el tópico principal"** del dataset.
+- **Confirmado**: de los eventos puntuales buscados específicamente, el tópico de la elección/protestas en Irán es prácticamente inexistente antes del 12/6/2009 y explota el 15/6, con ~86% de sentimiento negativo (vs. ~50% esperado) — validación externa de que BERTopic detecta eventos reales, no ruido.
+- **Corregido, no forzado**: la hipótesis sobre Michael Jackson no se sostuvo — no llegó a formar un tópico propio (la recolección del dataset corta ~4hs antes del anuncio de su muerte) — se documentó como hallazgo honesto en vez de sostener una conclusión no respaldada por los datos.
 
 ### Métrica obligatoria (cosine similarity), tres contextos
 
