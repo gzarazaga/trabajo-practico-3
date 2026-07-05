@@ -114,13 +114,15 @@ Los tres entran bajo el límite duro de 100MB de GitHub, pero rondan la zona don
 
 ## Diferenciador — Análisis temporal de tópicos (BERTopic)
 
-Más allá de lo pedido, se suma un análisis exploratorio pensado como diferenciador (a pedido de la cátedra: "salir de lo típico"): en lugar de solo clasificar sentimiento, se busca **detectar eventos reales a partir de picos temáticos en el tiempo**.
+Más allá de lo pedido, se suma un análisis exploratorio pensado como diferenciador (a pedido de la cátedra: "salir de lo típico"): en lugar de solo clasificar sentimiento, se busca **detectar eventos reales a partir de picos temáticos en el tiempo**. Implementado en `notebooks/05_topicos_temporales.ipynb`.
 
-- Entrenar **BERTopic** una vez sobre el corpus (o una muestra representativa) para obtener los tópicos.
+- Entrenar **BERTopic** sobre una muestra representativa del corpus (80.000 tweets — embeber 1.6M en CPU es inviable en tiempo razonable) para obtener los tópicos.
 - Usar `topics_over_time()` para bucketizar por la columna `date` sin re-clusterizar.
-- Buscar picos de volumen por tópico/día y contrastarlos contra eventos conocidos del rango de fechas del dataset (abril–junio 2009): protestas post-electorales en Irán (mediados de junio) y la muerte de Michael Jackson (25/6/2009, límite superior del dataset).
-- Cruzar el pico temático con la polaridad promedio de sentimiento de esos tweets ese día, conectando este análisis con el resto del TP en lugar de dejarlo aislado.
-- BERTopic usa cosine similarity internamente (c-TF-IDF y clustering), por lo que también aporta a la métrica obligatoria.
+- Buscar picos de volumen por tópico/día y contrastarlos contra eventos conocidos del rango de fechas del dataset (abril–junio 2009).
+- Cruzar el pico temático con la polaridad promedio de sentimiento de esos tweets, conectando este análisis con el resto del TP en lugar de dejarlo aislado.
+- BERTopic usa cosine similarity internamente (c-TF-IDF y UMAP), por lo que también aporta a la métrica obligatoria.
+
+**Resultado:** se confirmó un pico real y verificable — el tópico de la elección/protestas en Irán es prácticamente inexistente antes del 12/6/2009 (fecha de la elección) y explota el 15/6, con ~86% de tweets negativos (vs. ~50% esperado por el balance del dataset). La hipótesis inicial sobre la muerte de Michael Jackson (25/6/2009, límite superior del dataset) **no se confirmó**: la recolección del dataset corta a las 10:28 (PDT) de ese día, ~4 horas antes de que se anunciara su muerte (~14:26 PDT) — se documenta como hallazgo honesto en vez de forzar una conclusión que los datos no respaldan.
 
 ---
 
