@@ -139,7 +139,8 @@ TP3/
     ├── 02_modelos_clasicos.ipynb        # TextBlob, BoW+NB, TF-IDF+LR
     ├── 03_word2vec.ipynb                # Entrenamiento Word2Vec y análisis semántico
     ├── 04_clasificacion_w2v.ipynb       # Clasificador sobre embeddings + comparación final
-    └── 05_topicos_temporales.ipynb      # Diferenciador: BERTopic + picos por día vs. eventos reales
+    ├── 05_topicos_temporales.ipynb      # Diferenciador: BERTopic + picos por día vs. eventos reales
+    └── 06_conclusiones.ipynb            # Conclusiones generales: comparación final de modelos + hallazgos de tópicos
 ```
 
 > Alternativa: notebook único `TP3_zarazaga.ipynb` con todas las secciones si se prefiere una entrega integrada.
@@ -167,6 +168,35 @@ TP3/
 - **Por qué Word2Vec propio en lugar de spaCy preentrenado**: Los embeddings de spaCy están entrenados sobre texto formal (web, Wikipedia). Twitter tiene vocabulario específico (slang, abreviaciones, emojis) que un modelo entrenado sobre el corpus propio captura mejor.
 - **Por qué ventana chica y ventana grande**: Siguiendo el análisis del notebook de clase, se espera que la ventana chica capture relaciones semánticas (sinónimos de sentimiento) y la ventana grande relaciones temáticas (contextos en los que aparecen).
 - **Por qué embedding promedio**: Es el enfoque más simple para pasar de token-level a document-level y permite mantener el clasificador como una caja blanca (LR) con coeficientes interpretables.
+
+---
+
+## Conclusiones generales
+
+Desarrollo completo en `notebooks/06_conclusiones.ipynb`. Resumen:
+
+### Sobre los modelos
+
+| Modelo | Acc (val) | F1 (val) | AUC (val) | Acc (manual) | F1 (manual) | AUC (manual) |
+|---|---|---|---|---|---|---|
+| TextBlob (baseline) | 0,612 | 0,699 | 0,688 | 0,688 | 0,752 | 0,797 |
+| BoW + Naive Bayes | 0,774 | 0,773 | 0,848 | 0,811 | 0,815 | 0,888 |
+| TF-IDF + Logistic Regression | 0,787 | 0,790 | 0,867 | 0,797 | 0,805 | 0,891 |
+| Word2Vec + Logistic Regression | 0,771 | 0,771 | 0,851 | **0,816** | **0,819** | 0,872 |
+
+- TextBlob queda último en las tres métricas y en ambos conjuntos — cumple su rol de cota inferior.
+- TF-IDF+LR lidera en validación; **Word2Vec+LR lidera en el test manual** (etiquetado humano) pese a no ganar en validación, con representaciones 200 veces más chicas (150 dimensiones densas vs. 30.000 dispersas).
+- Ningún modelo entrenado se derrumba en el test manual — generalizan más allá del heurístico de etiquetado por emoticon del archivo grande.
+- No hay un único "mejor modelo" sin contexto: depende de si importa más el desempeño dentro de distribución (TF-IDF+LR) o la generalización a juicio humano (Word2Vec+LR).
+
+### Sobre los tópicos (diferenciador)
+
+- **Confirmado**: el tópico de la elección/protestas en Irán es prácticamente inexistente antes del 12/6/2009 y explota el 15/6, con ~86% de sentimiento negativo (vs. ~50% esperado) — validación externa de que BERTopic detecta eventos reales, no ruido.
+- **Corregido, no forzado**: la hipótesis sobre Michael Jackson no se sostuvo (la recolección del dataset corta ~4hs antes del anuncio de su muerte) — se documentó como hallazgo honesto en vez de sostener una conclusión no respaldada por los datos.
+
+### Métrica obligatoria (cosine similarity), tres contextos
+
+Nivel palabra (Word2Vec, `03`), nivel documento (embeddings promedio, `04`), y modelado de tópicos (BERTopic internamente, `05`).
 
 ---
 
