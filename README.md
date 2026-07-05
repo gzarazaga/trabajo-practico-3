@@ -173,3 +173,4 @@ TP3/
 - Consigna oficial: `Instrucciones/Consignas_proyecto_NLP.ipynb`
 - Dataset: [Sentiment140](https://docs.google.com/file/d/0B04GJPshIjmPRnZManQwWEdTZjg/edit)
 - Notebooks de referencia de clase: `nlp_sentiment.ipynb`, `Embeddings.ipynb`, `Word Embedding - caso practico.ipynb`
+- Metodología original: Go, A., Bhayani, R. & Huang, L. (2009). *Twitter Sentiment Classification using Distant Supervision*, Stanford University — documenta que el archivo de entrenamiento se etiquetó por distant supervision (emoticones) y que `testdata.manual...csv` es el test set anotado a mano por los autores.
