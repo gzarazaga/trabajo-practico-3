@@ -43,17 +43,21 @@ Se combinan **tres enfoques progresivos** que permiten comparar representaciones
 El corpus se distribuye en dos archivos con esquemas de etiquetas distintos:
 
 - `training.1600000.processed.noemoticon.csv` (~1.6M, obligatorio): etiquetado automático por emoticon, **2 clases** (0/4).
-- `testdata.manual.2009.06.14.csv` (~500 registros, opcional): etiquetado a mano, **3 clases** (0/2/4), con ~28% de registros neutros.
+- `testdata.manual.2009.06.14.csv` (~500 registros, opcional): etiquetado con una metodología distinta a la del archivo grande, **3 clases** (0/2/4), con ~28% de registros neutros.
 
 Como ningún modelo entrenado sobre el archivo grande puede predecir "neutral", se evaluaron cuatro alternativas: (A) no usar el archivo chico, (B) sacar los registros neutros y usarlo como test externo, (C) usarlo completo con split train/test propio, (D) entrenar un modelo binario y discretizarlo en 3 clases post-hoc.
 
-**Por qué se filtran los neutros:** el archivo grande se etiquetó por *distant supervision* (emoticon), un proceso que nunca produjo un ejemplo neutral — los modelos entrenados ahí no tienen ninguna noción de esa clase en su frontera de decisión. Incluir neutros en la evaluación (o inventar un umbral que los discretice, opción D) es forzar un supuesto no validado: no hay datos de entrenamiento que respalden dónde debería ir ese corte. Filtrarlos no es descartar información porque sí, es reconocer que "neutral" es una categoría que solo existe en el juicio humano del archivo manual, no en la tarea que el modelo efectivamente aprendió.
+**Por qué se filtran los neutros:** el archivo grande se etiquetó por *distant supervision* (emoticon), un proceso que nunca produjo un ejemplo neutral — los modelos entrenados ahí no tienen ninguna noción de esa clase en su frontera de decisión. Incluir neutros en la evaluación (o inventar un umbral que los discretice, opción D) es forzar un supuesto no validado: no hay datos de entrenamiento que respalden dónde debería ir ese corte. Filtrarlos no es descartar información porque sí, es reconocer que "neutral" es una categoría que no existe en la tarea que el modelo efectivamente aprendió.
+
+**¿Es realmente un etiquetado manual/humano?** Es un punto que vale la pena no dar por sentado. Verificado contra una fuente independiente (Saif, Fernandez, He & Alani, 2014 — ver Referencias), el archivo chico coincide exactamente en composición (177 negativos, 182 positivos, 139 neutros) y en metodología de recolección (tweets buscados por query de producto/marca/persona, consistente con los 81 valores distintos de `query` que encontramos, contra 1 solo en el archivo grande) con lo que la literatura llama "STS-Test". Está bien corroborado que usa un proceso de etiquetado **distinto** al heurístico automático del archivo grande. Lo que **no** está documentado ni por los autores originales ni por esta fuente es cuántos anotadores lo etiquetaron ni el acuerdo entre ellos — a diferencia de otros datasets de la literatura (STS-Gold, SemEval) donde sí se reporta ese detalle. Por eso en el resto del TP se lo trata como "test manual"/"test externo" sin asumir un rigor de anotación que no está probado.
 
 **Verificación de independencia:** se chequeó solapamiento por texto y por id entre el archivo manual filtrado (359 registros) y el archivo de entrenamiento — 0 coincidencias en ambos casos, confirmando que es un test genuinamente out-of-sample.
 
 **Regla de implementación:** el archivo manual filtrado nunca pasa por `.fit()` de ningún componente (`Word2Vec`, `CountVectorizer`/`TfidfVectorizer`, clasificador) — todo se ajusta solo sobre el split del archivo grande, y el manual se usa exclusivamente en `.transform()`/`.predict()`. Así, filtrar sus neutros no afecta ningún parámetro aprendido, solo qué filas se usan para medir el modelo ya entrenado.
 
-**Decisión adoptada: opción B.** Se filtran los registros neutros (quedan ~359) y se usan exclusivamente como **segundo test set, out-of-sample e independiente** del split del archivo grande, para validar si los modelos generalizan de etiquetas automáticas (por emoticon) a etiquetas puestas por un humano. Se descartaron A (se pierde el único ground truth humano del dataset), C (con ~500 filas el split por clase queda con varianza altísima y no aporta nada entrenar junto a 1.6M) y D (requiere inventar un umbral de "zona neutral" sin datos que lo respalden). Detalle completo en `notebooks/00_lectura_y_discovery.ipynb`.
+**Limitación de tamaño de muestra:** con n=359, cualquier accuracy medida ahí tiene un intervalo de confianza (95%) de aproximadamente ±4 puntos porcentuales. Esto es suficiente para comparar contra un baseline claramente peor (TextBlob), pero no para rankear con precisión entre los tres modelos entrenados — sus intervalos se solapan entre sí. Detalle en `notebooks/04_clasificacion_w2v.ipynb`, sección 6.1.
+
+**Decisión adoptada: opción B.** Se filtran los registros neutros (quedan ~359) y se usan exclusivamente como **segundo test set, out-of-sample e independiente** del split del archivo grande, para chequear si los modelos generalizan más allá de las etiquetas automáticas por emoticon del archivo grande — no como un ranking preciso entre modelos. Se descartaron A (se pierde el único conjunto con un esquema de etiquetado distinto al heurístico automático), C (con ~500 filas el split por clase queda con varianza altísima y no aporta nada entrenar junto a 1.6M) y D (requiere inventar un umbral de "zona neutral" sin datos que lo respalden). Detalle completo en `notebooks/00_lectura_y_discovery.ipynb`.
 
 ---
 
@@ -179,17 +183,18 @@ Desarrollo completo en `notebooks/06_conclusiones.ipynb`. Resumen:
 
 ### Sobre los modelos
 
-| Modelo | Acc (val) | F1 (val) | AUC (val) | Acc (manual) | F1 (manual) | AUC (manual) |
-|---|---|---|---|---|---|---|
-| TextBlob (baseline) | 0,612 | 0,699 | 0,688 | 0,688 | 0,752 | 0,797 |
-| BoW + Naive Bayes | 0,774 | 0,773 | 0,848 | 0,811 | 0,815 | 0,888 |
-| TF-IDF + Logistic Regression | 0,787 | 0,790 | 0,867 | 0,797 | 0,805 | 0,891 |
-| Word2Vec + Logistic Regression | 0,771 | 0,771 | 0,851 | **0,816** | **0,819** | 0,872 |
+| Modelo | Acc (val) | F1 (val) | AUC (val) | Acc (manual) | IC 95% (manual) |
+|---|---|---|---|---|---|
+| TextBlob (baseline) | 0,612 | 0,699 | 0,688 | 0,688 | [0,64 – 0,74] |
+| BoW + Naive Bayes | 0,774 | 0,773 | 0,848 | 0,811 | [0,77 – 0,85] |
+| TF-IDF + Logistic Regression | 0,787 | 0,790 | 0,867 | 0,797 | [0,76 – 0,84] |
+| Word2Vec + Logistic Regression | 0,771 | 0,771 | 0,851 | 0,816 | [0,78 – 0,86] |
 
-- TextBlob queda último en las tres métricas y en ambos conjuntos — cumple su rol de cota inferior.
-- TF-IDF+LR lidera en validación; **Word2Vec+LR lidera en el test manual** (etiquetado humano) pese a no ganar en validación, con representaciones 200 veces más chicas (150 dimensiones densas vs. 30.000 dispersas).
-- Ningún modelo entrenado se derrumba en el test manual — generalizan más allá del heurístico de etiquetado por emoticon del archivo grande.
-- No hay un único "mejor modelo" sin contexto: depende de si importa más el desempeño dentro de distribución (TF-IDF+LR) o la generalización a juicio humano (Word2Vec+LR).
+- TextBlob queda último en las tres métricas y en ambos conjuntos — cumple su rol de cota inferior. La diferencia contra los tres modelos entrenados es estadísticamente sólida incluso en el test manual (n=359): su intervalo de confianza no se solapa con el de ninguno.
+- TF-IDF+LR lidera en validación con margen razonable.
+- **En el test manual, los tres modelos entrenados quedan estadísticamente empatados**: Word2Vec+LR tiene el punto más alto (0,816), pero con n=359 el margen de error ronda ±4pp y los tres intervalos se solapan casi por completo — no se puede afirmar cuál generaliza mejor con esta muestra.
+- Lo que sí se sostiene: ningún modelo entrenado se derrumba en el test manual — los tres generalizan más allá del heurístico de etiquetado por emoticon del archivo grande.
+- No hay un único "mejor modelo" sin contexto: en validación gana TF-IDF+LR; en el test manual, los tres entrenados están empatados entre sí y todos superan claramente a TextBlob.
 
 ### Sobre los tópicos (diferenciador)
 
@@ -208,4 +213,5 @@ Nivel palabra (Word2Vec, `03`), nivel documento (embeddings promedio, `04`), y m
 - Consigna oficial: `Instrucciones/Consignas_proyecto_NLP.ipynb`
 - Dataset: [Sentiment140](https://docs.google.com/file/d/0B04GJPshIjmPRnZManQwWEdTZjg/edit)
 - Notebooks de referencia de clase: `nlp_sentiment.ipynb`, `Embeddings.ipynb`, `Word Embedding - caso practico.ipynb`
-- Metodología original: Go, A., Bhayani, R. & Huang, L. (2009). *Twitter Sentiment Classification using Distant Supervision*, Stanford University — documenta que el archivo de entrenamiento se etiquetó por distant supervision (emoticones) y que `testdata.manual...csv` es el test set anotado a mano por los autores.
+- Dataset original: Go, A., Bhayani, R. & Huang, L. (2009). *Twitter Sentiment Classification using Distant Supervision*, Stanford University — paper que introduce Sentiment140. No se verificó su texto original en este TP; la caracterización del archivo de entrenamiento (etiquetado por distant supervision/emoticones) surge de la propia estructura de los datos (ver `00_lectura_y_discovery.ipynb`).
+- **Verificación independiente del test manual** (sí leída y contrastada dato por dato en este TP): Saif, H., Fernandez, M., He, Y. & Alani, H. (2014). *"Evaluation Datasets for Twitter Sentiment Analysis: A survey and a new dataset, the STS-Gold"*, CEUR Workshop Proceedings Vol-1096. Describe el archivo chico ("STS-Test") con 177 negativos/182 positivos/139 neutros — coincide exactamente con nuestros propios números — y confirma que usa un proceso de etiquetado distinto al heurístico automático del archivo grande. El mismo paper señala como limitación conocida que Go et al. no documentaron cuántos anotadores participaron ni el acuerdo entre ellos.
