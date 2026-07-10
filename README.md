@@ -124,6 +124,7 @@ Más allá de lo pedido, se suma un análisis exploratorio pensado como diferenc
 - Usar `topics_over_time()` para bucketizar por la columna `date` sin re-clusterizar.
 - Buscar picos de volumen por tópico/día y contrastarlos contra eventos conocidos del rango de fechas del dataset (abril–junio 2009).
 - Cruzar el pico temático con la polaridad promedio de sentimiento de esos tweets, conectando este análisis con el resto del TP en lugar de dejarlo aislado.
+- Visualizar la **jerarquía de tópicos** (dendrograma, `visualize_hierarchy()`) para ver con qué otros tópicos se agrupa Irán — no con otros tópicos de "crisis" (no hay entre los más grandes), sino con quejas cotidianas menores (dolor de cabeza, aburrimiento, lluvia, dentista): la jerarquía agrupa por similitud de vocabulario/tono (`c-TF-IDF`), no por tema estricto, y Irán comparte ese registro de queja/negatividad.
 - BERTopic usa cosine similarity internamente (c-TF-IDF y UMAP), por lo que también aporta a la métrica obligatoria.
 
 **Aclaración importante:** los tópicos dominantes por volumen del corpus **no son políticos** — son charla cotidiana de Twitter (sueño/cama, agradecimientos, mascotas, clima, cumpleaños, el propio Twitter). Irán no es "el tópico principal" del dataset; es el caso de éxito elegido entre los eventos candidatos para poner a prueba la metodología de detección de eventos por picos de volumen.
