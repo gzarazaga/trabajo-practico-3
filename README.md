@@ -141,6 +141,7 @@ TP3/
 │   └── Consignas_proyecto_NLP.ipynb
 └── notebooks/
     ├── 00_lectura_y_discovery.ipynb     # Exploración de los dos archivos raw + decisión sobre el test manual
+    ├── 00b_eda_contenido.ipynb          # EDA de contenido: longitud, hashtags, menciones y wordclouds por polaridad
     ├── 01_preprocesamiento.ipynb        # Limpieza y tokenización de tweets
     ├── 02_modelos_clasicos.ipynb        # TextBlob, BoW+NB, TF-IDF+LR
     ├── 03_word2vec.ipynb                # Entrenamiento Word2Vec y análisis semántico
