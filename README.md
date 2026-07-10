@@ -130,6 +130,21 @@ Más allá de lo pedido, se suma un análisis exploratorio pensado como diferenc
 
 **Resultado:** de los dos eventos puntuales buscados específicamente por caer dentro del rango de fechas del dataset, solo uno dejó una huella detectable como tópico propio. El tópico de la elección/protestas en Irán es prácticamente inexistente antes del 12/6/2009 (fecha de la elección) y explota el 15/6, con ~86% de tweets negativos (vs. ~50% esperado por el balance del dataset) — un pico real y verificable. La hipótesis inicial sobre la muerte de Michael Jackson (25/6/2009, límite superior del dataset) **no se confirmó**: no llegó a formar un tópico propio (solo menciones sueltas y anteriores al hecho) porque la recolección del dataset corta a las 10:28 (PDT) de ese día, ~4 horas antes de que se anunciara su muerte (~14:26 PDT) — se documenta como hallazgo honesto en vez de forzar una conclusión que los datos no respaldan.
 
+### Clustering manual vs. BERTopic (`05b_clustering_manual.ipynb`)
+
+BERTopic combina `sentence-transformers` + `UMAP` + `HDBSCAN` + `c-TF-IDF`. Para no dar por sentado que esas piezas son la mejor opción, se armó el mismo tipo de pipeline "a mano" — `K-Means` y `DBSCAN` de scikit-learn en vez de `HDBSCAN`, con extracción de términos por cluster escrita a mano — sobre la misma muestra, mismos embeddings y mismo espacio UMAP de 5D, para que la comparación sea justa.
+
+| Método | Clusters | % ruido | Silhouette |
+|---|---|---|---|
+| K-Means (K=20) | 20 | 0,0% | 0,357 |
+| DBSCAN (mejor `eps`=0.15) | 272 | 25,9% | 0,095 |
+| BERTopic (HDBSCAN) | 649 | 51,5% | **0,558** |
+
+- **BERTopic/HDBSCAN gana en calidad global de clustering** (silhouette más alto) — confirmado empíricamente, no asumido.
+- **La ventaja no es "poder encontrar" el tópico de Irán**: un DBSCAN bien afinado también lo aísla, con tamaño casi idéntico (77 tweets). La ventaja de HDBSCAN es la calidad del resto de la partición — no depende de un único radio de densidad global (`eps`) como DBSCAN, algo difícil de ajustar en un corpus con densidades muy dispares.
+- **K-Means, con K fijo y sin noción de ruido, diluye eventos puntuales**: el tópico de Irán queda mezclado con vocabulario genérico de Twitter en vez de aislarse en su propio cluster.
+- Costo de la ventaja de HDBSCAN: deja ~51% de los tweets sin tópico asignado (ruido), mucho más que las alternativas — prioriza cohesión sobre cobertura.
+
 ---
 
 ## Estructura del repositorio
@@ -147,6 +162,7 @@ TP3/
     ├── 03_word2vec.ipynb                # Entrenamiento Word2Vec y análisis semántico
     ├── 04_clasificacion_w2v.ipynb       # Clasificador sobre embeddings + comparación final
     ├── 05_topicos_temporales.ipynb      # Diferenciador: BERTopic + picos por día vs. eventos reales
+    ├── 05b_clustering_manual.ipynb      # K-Means/DBSCAN a mano vs. BERTopic, mismo espacio de embeddings
     └── 06_conclusiones.ipynb            # Conclusiones generales: comparación final de modelos + hallazgos de tópicos
 ```
 
