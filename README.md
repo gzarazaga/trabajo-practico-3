@@ -63,17 +63,19 @@ Como ningún modelo entrenado sobre el archivo grande puede predecir "neutral", 
 
 ## Datos versionados en el repositorio
 
-`data/raw/` y `data/processed/*.csv` están en `.gitignore` — se regeneran corriendo `00_lectura_y_discovery.ipynb` y `01_preprocesamiento.ipynb` respectivamente. El principal motivo es `train_processed.csv` (~230MB), que supera cómodamente el límite práctico de GitHub.
+`data/raw/` está en `.gitignore` — se regenera corriendo `00_lectura_y_discovery.ipynb`. `data/processed/*.csv` también está ignorado por defecto, con una excepción: `train_processed.csv.gz`.
 
-**Nota pendiente (no decidida todavía):** se evaluó comprimir `train_processed.csv` para poder versionarlo. Mediciones sobre el archivo real:
+**Decisión adoptada sobre `train_processed.csv` (~240MB sin comprimir, supera el límite práctico de GitHub):** se comprime con `gzip -9` (78MB, ~10s) y se versiona como `train_processed.csv.gz`. `01_preprocesamiento.ipynb` escribe directamente ese archivo (pandas soporta `.csv.gz` de forma nativa en `to_csv`/`read_csv`, infiriendo la compresión por extensión — no requiere cambios de código más allá del nombre del archivo), y el resto de los notebooks (`02` a `05b`) lo leen desde ahí sin ningún paso de descompresión manual.
+
+Se evaluaron otras alternativas antes de decidir:
 
 | Método | Tamaño resultante | Tiempo |
 |---|---|---|
-| gzip -9 | 78,3 MB | rápido |
+| **gzip -9 (elegido)** | **78,3 MB** | **rápido (~10s)** |
 | xz -6 | 61,5 MB | ~2 min |
 | zstd -19 | 59,8 MB | ~1,3 min |
 
-Los tres entran bajo el límite duro de 100MB de GitHub, pero rondan la zona donde el clone del repo empieza a pesar (~60-80MB) y GitHub ya avisa de "archivo grande". Alternativa a considerar más adelante si se quiere que el repo sea autocontenido sin correr el pipeline: **Git LFS** en vez de comprimir a mano. Por ahora se mantiene sin publicar y se regenera localmente.
+xz/zstd comprimen más, pero requieren declarar `compression="xz"`/instalar `zstandard` para que pandas los lea, y la ganancia (~17-20MB) no justificaba la fricción extra para un repo de TP. **Git LFS** quedó descartado por el setup adicional (`git lfs install`, tracking, cuota del plan free) para un entregable con fecha fija. `train_processed.csv` sin comprimir y `data/raw/` se mantienen fuera del repo y se regeneran localmente con el pipeline.
 
 ---
 
@@ -124,6 +126,7 @@ Más allá de lo pedido, se suma un análisis exploratorio pensado como diferenc
 - Usar `topics_over_time()` para bucketizar por la columna `date` sin re-clusterizar.
 - Buscar picos de volumen por tópico/día y contrastarlos contra eventos conocidos del rango de fechas del dataset (abril–junio 2009).
 - Cruzar el pico temático con la polaridad promedio de sentimiento de esos tweets, conectando este análisis con el resto del TP en lugar de dejarlo aislado.
+- **Triangulación independiente**: `00b_eda_contenido.ipynb` cuenta hashtags de forma simple (regex, sin ningún modelo de por medio) y `#iranelection` sale entre los más frecuentes del lado negativo del corpus completo (518 menciones) — dos métodos completamente distintos (clustering de embeddings vs. conteo de hashtags) coinciden en la misma señal, lo que da más confianza en el hallazgo que si viniera de un solo método.
 - Visualizar la **jerarquía de tópicos** (dendrograma, `visualize_hierarchy()`) para ver con qué otros tópicos se agrupa Irán — no con otros tópicos de "crisis" (no hay entre los más grandes), sino con quejas cotidianas menores (dolor de cabeza, aburrimiento, lluvia, dentista): la jerarquía agrupa por similitud de vocabulario/tono (`c-TF-IDF`), no por tema estricto, y Irán comparte ese registro de queja/negatividad.
 - BERTopic usa cosine similarity internamente (c-TF-IDF y UMAP), por lo que también aporta a la métrica obligatoria.
 
@@ -218,6 +221,7 @@ Desarrollo completo en `notebooks/06_conclusiones.ipynb`. Resumen:
 
 - **Los tópicos dominantes por volumen son charla cotidiana**, no política: sueño/cama, agradecimientos, mascotas, clima, cumpleaños, el propio Twitter. Irán **no es "el tópico principal"** del dataset.
 - **Confirmado**: de los eventos puntuales buscados específicamente, el tópico de la elección/protestas en Irán es prácticamente inexistente antes del 12/6/2009 y explota el 15/6, con ~86% de sentimiento negativo (vs. ~50% esperado) — validación externa de que BERTopic detecta eventos reales, no ruido.
+- **Triangulación independiente** (`00b_eda_contenido.ipynb`): un conteo simple de hashtags (sin ningún modelo) muestra a `#iranelection` entre los más frecuentes del lado negativo del corpus completo (518 menciones) — dos métodos distintos, clustering de embeddings y conteo de hashtags, coinciden en la misma señal.
 - **Corregido, no forzado**: la hipótesis sobre Michael Jackson no se sostuvo — no llegó a formar un tópico propio (la recolección del dataset corta ~4hs antes del anuncio de su muerte) — se documentó como hallazgo honesto en vez de sostener una conclusión no respaldada por los datos.
 
 ### Métrica obligatoria (cosine similarity), tres contextos
