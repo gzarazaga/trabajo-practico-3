@@ -21,8 +21,8 @@ ENV/
 .AppleDouble
 .LSOverride
 
-# Datos crudos (pesados, no se versionan)
-data/raw/
+# Datos crudos (el archivo grande sin comprimir no se versiona; sí su .gz y el archivo de test manual, chico)
+data/raw/training.1600000.processed.noemoticon.csv
 
 # Datos procesados (regenerables desde 01_preprocesamiento.ipynb)
 # train_processed.csv sin comprimir pesa ~240MB, supera el límite de GitHub -> se versiona como train_processed.csv.gz (78MB, no ignorado por este patrón)
