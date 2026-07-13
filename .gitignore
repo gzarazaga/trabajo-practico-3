@@ -27,12 +27,16 @@ data/raw/
 # Datos procesados (regenerables desde 01_preprocesamiento.ipynb)
 # train_processed.csv sin comprimir pesa ~240MB, supera el límite de GitHub -> se versiona como train_processed.csv.gz (78MB, no ignorado por este patrón)
 data/processed/*.csv
+# topicos_train.csv es un objeto entregable chico (tabla de tópicos de 05_topicos_temporales.ipynb) -> sí se versiona
+!data/processed/topicos_train.csv
 
 # Modelos entrenados (pesados, no se versionan)
 models/*.model
 models/*.bin
 models/*.p
 models/*.pkl
+# Cache de embeddings del corpus completo (~2.5GB, regenerable desde 05_topicos_temporales.ipynb)
+models/*.npy
 
 # IDEs
 .idea/
