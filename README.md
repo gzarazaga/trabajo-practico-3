@@ -137,6 +137,8 @@ Más allá de lo pedido, se suma un análisis exploratorio pensado como diferenc
 
 **Costo de cómputo real:** ~22 min de embeddings + ~9h43min de fit de BERTopic (UMAP+HDBSCAN no escalan linealmente con la cantidad de puntos) sobre un equipo con 32GB de RAM.
 
+**Nota sobre `models/embeddings_train_full.npy`:** el cache de embeddings (2,43GB) generado por este notebook **no está incluido en GitHub** (excluido vía `.gitignore`). A diferencia del dataset crudo (que sí se versiona comprimido, ver abajo), este archivo no es candidato a compresión — son floats de alta entropía, gzip solo lo reduce a ~93% de su tamaño original — y de todos modos es 100% regenerable corriendo la sección 2 del notebook. Quien clone el repo y quiera reproducir la corrida completa va a recalcularlo una vez.
+
 ### Clustering manual vs. BERTopic (`05b_clustering_manual.ipynb`)
 
 BERTopic combina `sentence-transformers` + `UMAP` + `HDBSCAN` + `c-TF-IDF`. Para no dar por sentado que esas piezas son la mejor opción, se armó el mismo tipo de pipeline "a mano" — `K-Means` y `DBSCAN` de scikit-learn en vez de `HDBSCAN`, con extracción de términos por cluster escrita a mano — sobre la misma muestra, mismos embeddings y mismo espacio UMAP de 5D, para que la comparación sea justa.
