@@ -214,11 +214,11 @@ Desarrollo completo en `notebooks/06_conclusiones.ipynb`. Resumen:
 | TextBlob (baseline) | 0,612 | 0,699 | 0,688 | 0,688 | [0,64 – 0,74] |
 | BoW + Naive Bayes | 0,774 | 0,773 | 0,848 | 0,811 | [0,77 – 0,85] |
 | TF-IDF + Logistic Regression | 0,787 | 0,790 | 0,867 | 0,797 | [0,76 – 0,84] |
-| Word2Vec + Logistic Regression | 0,771 | 0,771 | 0,851 | 0,816 | [0,78 – 0,86] |
+| Word2Vec + Logistic Regression | 0,771 | 0,771 | 0,851 | 0,811 | [0,77 – 0,85] |
 
 - TextBlob queda último en las tres métricas y en ambos conjuntos — cumple su rol de cota inferior. La diferencia contra los tres modelos entrenados es estadísticamente sólida incluso en el test manual (n=359): su intervalo de confianza no se solapa con el de ninguno.
 - TF-IDF+LR lidera en validación con margen razonable.
-- **En el test manual, los tres modelos entrenados quedan estadísticamente empatados**: Word2Vec+LR tiene el punto más alto (0,816), pero con n=359 el margen de error ronda ±4pp y los tres intervalos se solapan casi por completo — no se puede afirmar cuál generaliza mejor con esta muestra.
+- **En el test manual, los tres modelos entrenados quedan estadísticamente empatados**: Word2Vec+LR y BoW+Naive Bayes empatan en el punto más alto (0,811 cada uno), TF-IDF+LR queda apenas detrás (0,797) — con n=359 el margen de error ronda ±4pp y los tres intervalos se solapan casi por completo, no se puede afirmar cuál generaliza mejor con esta muestra.
 - Lo que sí se sostiene: ningún modelo entrenado se derrumba en el test manual — los tres generalizan más allá del heurístico de etiquetado por emoticon del archivo grande.
 - No hay un único "mejor modelo" sin contexto: en validación gana TF-IDF+LR; en el test manual, los tres entrenados están empatados entre sí y todos superan claramente a TextBlob.
 
