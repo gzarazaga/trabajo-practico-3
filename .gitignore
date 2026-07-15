@@ -29,6 +29,8 @@ data/raw/training.1600000.processed.noemoticon.csv
 data/processed/*.csv
 # topicos_train.csv es un objeto entregable chico (tabla de tópicos de 05_topicos_temporales.ipynb) -> sí se versiona
 !data/processed/topicos_train.csv
+# test_manual_processed.csv es chico (59KB) -- mismo criterio que train_processed.csv.gz, se versiona por conveniencia
+!data/processed/test_manual_processed.csv
 
 # Modelos entrenados (pesados, no se versionan)
 models/*.model
