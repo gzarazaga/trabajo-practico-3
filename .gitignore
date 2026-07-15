@@ -40,6 +40,8 @@ models/*.model
 models/*.bin
 models/*.p
 models/*.pkl
+# word2vec_ventana_chica.model entra bajo el limite de GitHub (57.4MB) -- se versiona como modelo principal de 04_clasificacion_w2v.ipynb
+!models/word2vec_ventana_chica.model
 # Cache de embeddings del corpus completo (~2.5GB, regenerable desde 05_topicos_temporales.ipynb)
 models/*.npy
 
