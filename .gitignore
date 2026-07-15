@@ -31,6 +31,9 @@ data/processed/*.csv
 !data/processed/topicos_train.csv
 # test_manual_processed.csv es chico (59KB) -- mismo criterio que train_processed.csv.gz, se versiona por conveniencia
 !data/processed/test_manual_processed.csv
+# comparacion_enfoques*.csv son la tabla de resultados final (entregable), no datos intermedios -- se versionan
+!data/processed/comparacion_enfoques.csv
+!data/processed/comparacion_enfoques_final.csv
 
 # Modelos entrenados (pesados, no se versionan)
 models/*.model

@@ -1,0 +1,4 @@
+modelo,accuracy_val,f1_val,auc_val,accuracy_manual,f1_manual,auc_manual
+TextBlob (baseline),0.6115,0.6989,0.6879,0.688,0.7522,0.7974
+BoW + Naive Bayes,0.7739,0.7733,0.8479,0.8106,0.8152,0.8881
+TF-IDF + Logistic Regression,0.7866,0.7902,0.8667,0.7967,0.8053,0.8911
